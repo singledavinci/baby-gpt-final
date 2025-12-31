@@ -1,0 +1,4 @@
+Flask
+numpy
+onnxruntime-cpu
+tiktoken
