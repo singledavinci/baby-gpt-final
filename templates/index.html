@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BabyGPT Terminal</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            padding: 2rem;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline effect */
+        .container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        h1 {
+            text-align: center;
+            text-shadow: 0 0 10px #00ff41;
+            margin-bottom: 2rem;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #1a2f1a;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #050505;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap; /* Preserve formatting */
+        }
+
+        .user-msg {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .ai-msg {
+            color: #00ff41;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+        }
+
+        textarea {
+            flex: 1;
+            background: #000;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: inherit;
+            padding: 10px;
+            resize: none;
+            height: 50px;
+            outline: none;
+        }
+
+        button {
+            padding: 0 2rem;
+            background: #00ff41;
+            color: #000;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #00cc33;
+            box-shadow: 0 0 15px #00ff41;
+        }
+        
+        button:disabled {
+            background: #333;
+            cursor: not-allowed;
+            color: #555;
+            box-shadow: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ff41;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BabyGPT v1.0</h1>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="message ai-msg">System initialized. Model loaded. Waiting for input...</div>
+        </div>
+
+        <div class="input-area">
+            <textarea id="inputText" placeholder="Type prompt (e.g. 'O romeo')..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { startGeneration(); event.preventDefault(); }"></textarea>
+            <button id="sendBtn" onclick="startGeneration()">GENERATE</button>
+        </div>
+    </div>
+
+    <script>
+        async function startGeneration() {
+            const inputEl = document.getElementById('inputText');
+            const btnEl = document.getElementById('sendBtn');
+            const chatBox = document.getElementById('chatBox');
+            const text = inputEl.value;
+
+            if (!text.trim()) return;
+
+            // Disable UI
+            inputEl.disabled = true;
+            btnEl.disabled = true;
+            btnEl.innerText = "THINKING...";
+
+            // Show User Prompt
+            chatBox.innerHTML += `<div class="message user-msg">> ${text}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                
+                // Show AI Response
+                chatBox.innerHTML += `<div class="message ai-msg">${data.response}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+            } catch (err) {
+                chatBox.innerHTML += `<div class="message ai-msg" style="color:red">Error: Connection Failed</div>`;
+            }
+
+            // Re-enable UI
+            inputEl.value = '';
+            inputEl.disabled = false;
+            btnEl.disabled = false;
+            btnEl.innerText = "GENERATE";
+            inputEl.focus();
+        }
+    </script>
+</body>
+</html>
