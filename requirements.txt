@@ -2,3 +2,4 @@ Flask
 numpy
 onnxruntime-cpu
 tiktoken
+gunicorn
