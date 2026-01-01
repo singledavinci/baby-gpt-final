@@ -1,188 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BabyGPT Terminal</title>
+    <title>GeniusGPT Terminal</title>
     <style>
-        body {
-            background-color: #0d0d0d;
-            color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #00ff88;
             padding: 20px;
         }
 
         .container {
-            width: 80%;
             max-width: 800px;
-            background: rgba(0, 20, 0, 0.9);
-            border: 2px solid #00ff41;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-            padding: 2rem;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Scanline effect */
-        .container::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
+            margin: 0 auto;
         }
 
         h1 {
             text-align: center;
-            text-shadow: 0 0 10px #00ff41;
-            margin-bottom: 2rem;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff88;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #1a2f1a;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: #050505;
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            }
+
+            to {
+                text-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88, 0 0 60px #00aa55;
+            }
         }
 
-        .message {
-            margin-bottom: 1rem;
-            line-height: 1.5;
-            white-space: pre-wrap; /* Preserve formatting */
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
         }
 
-        .user-msg {
-            color: #ffffff;
+        .badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
             font-weight: bold;
         }
 
-        .ai-msg {
-            color: #00ff41;
+        #output {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            max-height: 500px;
         }
 
         .input-area {
             display: flex;
-            gap: 1rem;
+            gap: 10px;
         }
 
         textarea {
             flex: 1;
-            background: #000;
-            border: 1px solid #00ff41;
-            color: #00ff41;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 15px;
+            color: #00ff88;
             font-family: inherit;
-            padding: 10px;
+            font-size: 1em;
             resize: none;
-            height: 50px;
+        }
+
+        textarea:focus {
             outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         button {
-            padding: 0 2rem;
-            background: #00ff41;
-            color: #000;
+            background: linear-gradient(135deg, #00ff88, #00aa55);
             border: none;
-            font-family: inherit;
+            border-radius: 10px;
+            padding: 15px 30px;
+            color: #000;
             font-weight: bold;
+            font-size: 1em;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background: #00cc33;
-            box-shadow: 0 0 15px #00ff41;
-        }
-        
-        button:disabled {
-            background: #333;
-            cursor: not-allowed;
-            color: #555;
-            box-shadow: none;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
-        ::-webkit-scrollbar-track {
-            background: #000;
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9em;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #00ff41;
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #00ff88;
+            font-size: 1.2em;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>BabyGPT v1.0</h1>
-        
-        <div class="chat-box" id="chatBox">
-            <div class="message ai-msg">System initialized. Model loaded. Waiting for input...</div>
-        </div>
+        <h1>🧠 GeniusGPT</h1>
+        <p class="subtitle">49M Parameter Llama-Lite Model <span class="badge">v2.0 GENIUS</span></p>
+
+        <div id="output">Welcome to GeniusGPT! I'm a 49 million parameter model trained on stories and knowledge.
+
+            Type something and press GENERATE to see what I've learned...</div>
 
         <div class="input-area">
-            <textarea id="inputText" placeholder="Type prompt (e.g. 'O romeo')..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { startGeneration(); event.preventDefault(); }"></textarea>
-            <button id="sendBtn" onclick="startGeneration()">GENERATE</button>
+            <textarea id="prompt" rows="3" placeholder="Enter your prompt..."></textarea>
+            <button id="sendBtn" onclick="generate()">GENERATE</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">49M</div>Parameters
+            </div>
+            <div class="stat">
+                <div class="stat-value">128</div>Context
+            </div>
+            <div class="stat">
+                <div class="stat-value">Llama</div>Architecture
+            </div>
         </div>
     </div>
 
     <script>
-        async function startGeneration() {
-            const inputEl = document.getElementById('inputText');
-            const btnEl = document.getElementById('sendBtn');
-            const chatBox = document.getElementById('chatBox');
-            const text = inputEl.value;
+        async function generate() {
+            const prompt = document.getElementById('prompt').value;
+            const output = document.getElementById('output');
+            const btn = document.getElementById('sendBtn');
 
-            if (!text.trim()) return;
+            if (!prompt.trim()) return;
 
-            // Disable UI
-            inputEl.disabled = true;
-            btnEl.disabled = true;
-            btnEl.innerText = "THINKING...";
-
-            // Show User Prompt
-            chatBox.innerHTML += `<div class="message user-msg">> ${text}</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            btn.disabled = true;
+            btn.textContent = 'THINKING...';
+            output.textContent = prompt + '\n\n[Generating...]';
 
             try {
-                const response = await fetch('/generate', {
+                const res = await fetch('/generate', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ text: text })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt, max_tokens: 100 })
                 });
-
-                const data = await response.json();
-                
-                // Show AI Response
-                chatBox.innerHTML += `<div class="message ai-msg">${data.response}</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-            } catch (err) {
-                chatBox.innerHTML += `<div class="message ai-msg" style="color:red">Error: Connection Failed</div>`;
+                const data = await res.json();
+                output.textContent = data.response || data.error;
+            } catch (e) {
+                output.textContent = 'Error: ' + e.message;
             }
 
-            // Re-enable UI
-            inputEl.value = '';
-            inputEl.disabled = false;
-            btnEl.disabled = false;
-            btnEl.innerText = "GENERATE";
-            inputEl.focus();
+            btn.disabled = false;
+            btn.textContent = 'GENERATE';
         }
+
+        document.getElementById('prompt').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                generate();
+            }
+        });
     </script>
 </body>
+
 </html>
