@@ -27,7 +27,7 @@ def generate_text(prompt, max_tokens=100, temperature=0.8):
         input_array = np.array([input_tokens], dtype=np.int64)
         
         # Run inference
-        outputs = session.run(None, {'input': input_array})
+        outputs = session.run(None, {'input_ids': input_array})
         logits = outputs[0][0, -1, :]  # Get last token logits
         
         # Apply temperature
@@ -65,4 +65,5 @@ def generate():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
