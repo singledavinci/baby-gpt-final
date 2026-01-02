@@ -27,7 +27,10 @@ if not os.path.exists(model_path) and MODEL_URL != "PASTE_DIRECT_DOWNLOAD_LINK_H
         print(f"Error downloading model: {e}")
 
 # Load ONNX model
-session = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
+sess_options = ort.SessionOptions()
+sess_options.intra_op_num_threads = 1
+sess_options.inter_op_num_threads = 1
+session = ort.InferenceSession(model_path, sess_options, providers=['CPUExecutionProvider'])
 
 def generate_text(prompt, max_tokens=100, temperature=0.8):
     tokens = enc.encode(prompt)
