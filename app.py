@@ -3,6 +3,7 @@ import onnxruntime as ort
 import numpy as np
 import tiktoken
 import os
+import urllib.request
 
 app = Flask(__name__)
 
@@ -10,8 +11,22 @@ app = Flask(__name__)
 enc = tiktoken.get_encoding("gpt2")
 block_size = 128
 
-# Load ONNX model
+# Model will be downloaded from this URL on first run
+# Upload your model.onnx to: https://tmpfiles.org/ or https://gofile.io/
+# Then paste the direct download link here:
+MODEL_URL = "PASTE_DIRECT_DOWNLOAD_LINK_HERE"
 model_path = os.path.join(os.path.dirname(__file__), 'model.onnx')
+
+# Download model if not present
+if not os.path.exists(model_path) and MODEL_URL != "PASTE_DIRECT_DOWNLOAD_LINK_HERE":
+    print("Downloading model (50MB)...")
+    try:
+        urllib.request.urlretrieve(MODEL_URL, model_path)
+        print("Model downloaded successfully!")
+    except Exception as e:
+        print(f"Error downloading model: {e}")
+
+# Load ONNX model
 session = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
 
 def generate_text(prompt, max_tokens=100, temperature=0.8):
